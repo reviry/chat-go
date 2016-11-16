@@ -20,7 +20,6 @@ func main() {
   }
   defer conn.Close()
 
-  fmt.Println("You received a new message!")
   buf := make([]byte, 1024)
   for {
     n, err := conn.Read(buf)
@@ -30,6 +29,7 @@ func main() {
     if err != nil {
       fmt.Printf("Read error: %s\n", err)
     }
+    fmt.Println("You received a new message!")
     fmt.Print(string(buf[:n]))
   }
 }

@@ -3,6 +3,8 @@ package main
 import (
   "fmt"
   "net"
+  "bufio"
+  "os"
 )
 
 func main() {
@@ -13,6 +15,9 @@ func main() {
   }
   defer conn.Close()
 
-  sendMsg := "Test Message.\n"
-  conn.Write([]byte(sendMsg))
+  scanner := bufio.NewScanner(os.Stdin)
+  for scanner.Scan() {
+    sendMsg := scanner.Text() + "\n"
+    conn.Write([]byte(sendMsg))
+  }
 }

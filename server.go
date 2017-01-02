@@ -3,21 +3,27 @@ package main
 import (
   "fmt"
   "net"
+  "os"
 )
 
 func main() {
-  listener, err := net.Listen("tcp", "localhost:8888")
-  if err != nil {
-    fmt.Printf("Listen error: %s\n", err)
-    return
-  }
+  tcpAddr, err := net.ResolveTCPAddr("tcp4", ":8888")
+  checkError(err)
+  listener, err := net.ListenTCP("tcp", tcpAddr)
+  checkError(err)
+
   defer listener.Close()
 
-  conn, err := listener.Accept()
-  if err != nil {
-    fmt.Printf("Accept error: %s\n", err)
-    return
+  for {
+    conn, err := listener.Accept()
+    if err != nil {
+      continue
+    }
+    go handleClient(conn)
   }
+}
+
+func handleClient(conn net.Conn) {
   defer conn.Close()
 
   buf := make([]byte, 1024)
@@ -31,5 +37,12 @@ func main() {
     }
     fmt.Println("You received a new message!")
     fmt.Print(string(buf[:n]))
+  }
+}
+
+func checkError(err error) {
+  if err != nil {
+    fmt.Fprintf(os.Stderr, "Fatal error: %s", err.Error())
+    os.Exit(1)
   }
 }
